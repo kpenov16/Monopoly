@@ -1,3 +1,5 @@
+package dk.monopoly;
+
 import gui_fields.GUI_Field;
 import gui_fields.GUI_Player;
 import gui_fields.GUI_Start;

@@ -1,0 +1,11 @@
+towerMessage=Du har fundet Tower og får 250 kr, du er rig!
+craterMessage=Du har fundet Crater og får -100 kr, du er ikke rig!
+palaceGatesMessage=Du har fundet Palace gates og får +100 kr, du er rig!
+coldDesertMessage=Du har fundet Cold Desert og får -20 kr, du er ikke rig!
+walledCityMessage=Du har fundet Walled city og får +180 kr, du er rig!
+monasteryMessage=Du har fundet Monastery og får +0 kr !
+blackCaveMessage=Du har fundet Black cave og får -70 kr, du er ikke rig!
+hutsInTheMountainMessage=Du har fundet Huts in the mountain og får +60 kr, du er rig!
+theWerewallMessage=Du har fundet The Werewall in the mountain og får -80 kr, du er ikke rig!
+thePitMessage=Du har fundet The pit in the mountain og får -50 kr, du er ikke rig!
+goldMineMessage=Du har fundet Goldmine in the mountain og får +650 kr, du er ikke rig!
