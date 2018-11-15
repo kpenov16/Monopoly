@@ -132,6 +132,16 @@ class AccountTest {
         public int getDie(int index) {
             return 0;
         }
+
+        @Override
+        public void buy(Field field) {
+
+        }
+
+        @Override
+        public boolean ownsTwoFields(Field.FieldColor fieldColor) {
+            return false;
+        }
     }
 
 }

@@ -26,4 +26,7 @@ public abstract class Player extends Owner{
 
     public abstract int getDie(int index);
 
+    public abstract void buy(Field field);
+
+    public abstract boolean ownsTwoFields(Field.FieldColor fieldColor);
 }

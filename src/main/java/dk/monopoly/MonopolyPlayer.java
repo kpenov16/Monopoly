@@ -1,12 +1,13 @@
 package dk.monopoly;
 
-import dk.monopoly.ports.Account;
-import dk.monopoly.ports.Hand;
-import dk.monopoly.ports.InfoService;
-import dk.monopoly.ports.Player;
+import dk.monopoly.ports.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MonopolyPlayer extends Player {
     protected Account account;
+    private List<Field> fields = new ArrayList<>();
 
     public MonopolyPlayer(Account account){
         setAccount(account);
@@ -81,6 +82,25 @@ public class MonopolyPlayer extends Player {
     @Override
     public int getDie(int index) {
         return hand.getDie(index);
+    }
+
+    @Override
+    public void buy(Field field) {
+        account.subtract(field.getPrice());
+        this.fields.add(field);
+        field.setBuyer(this);
+    }
+
+    @Override
+    public boolean ownsTwoFields(Field.FieldColor fieldColor) {
+        int counts = 0;
+        for(Field f : fields){
+            if(f.getFieldColor().toString().equals(fieldColor.toString())) {
+                if(++counts == 2)
+                    return true;
+            }
+        }
+        return false;
     }
 
 
