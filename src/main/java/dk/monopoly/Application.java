@@ -1,5 +1,6 @@
 package dk.monopoly;
 
+import dk.monopoly.common.MonopolyGui;
 import gui_fields.GUI_Field;
 import gui_fields.GUI_Player;
 import gui_fields.GUI_Start;
@@ -11,6 +12,10 @@ import java.awt.*;
 public class Application {
 
     public static void main(String[] args){
+
+        MonopolyGui monopolyGui = new MonopolyGui();
+        monopolyGui.start();
+        /*
         GUI_Field[] fields = new GUI_Field[20];
 
         GUI_Player ico = new GUI_Player("Ico");
@@ -42,6 +47,8 @@ public class Application {
 
         fields[0].setCar(ico,true);
         fields[0].setCar(kaloyan,true);
+
+        */
 
     }
 }
