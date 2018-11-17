@@ -1,9 +1,23 @@
-package dk.monopoly.common;
+package dk.monopoly.ports;
 
 import dk.monopoly.*;
-import dk.monopoly.ports.*;
 
 public class Context {
+
+    public static Bank createBank(){
+        BankImpl bank = new BankImpl();
+        bank.setAccount(Context.createAccount());
+        return bank;
+    }
+
+    public static Field createField(String type){
+        Field field = null;
+        if(type.equals("hotel")){
+            field = new HotelImpl();
+            field.setBank(Context.createBank());
+        }
+        return field;
+    }
 
     public static Player createPlayer(){
         MonopolyPlayer p = new MonopolyPlayer( Context.createAccount() );

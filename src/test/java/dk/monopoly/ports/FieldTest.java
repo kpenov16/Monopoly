@@ -3,7 +3,6 @@ package dk.monopoly.ports;
 import dk.monopoly.BankImpl;
 import dk.monopoly.HotelImpl;
 import dk.monopoly.MonopolyAccount;
-import dk.monopoly.common.Context;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,9 +17,8 @@ class FieldTest {
 
     @BeforeEach
     void setUp() {
-        field = new HotelImpl();
-        bank = new BankImpl();
-        bank.setAccount(new MonopolyAccount());
+        field = Context.createField("hotel");
+        bank = Context.createBank();
         field.setBank(bank);
         owner = Context.createPlayer();
     }
@@ -53,29 +51,9 @@ class FieldTest {
 
         field.setBuyer(player);
         assertEquals(true, field.ownedBy(player));
+        assertEquals(player, field.getOwner());
         assertEquals(false, field.ownedBy(player2));
     }
-
-    @Test
-    public void playerBuyingAField(){
-        //hotel price
-        field.setPrice(50);
-        Bank bank = new BankImpl();
-        bank.setAccount(new MonopolyAccount());
-        bank.addProperty(field);
-
-        int bankBalanceBefore = bank.getBalance();
-
-        Player player = Context.createPlayer();
-        int newBalance = player.getBalance() - field.getPrice();
-
-        //act
-        player.buy(field);
-
-        //assert
-        assertEquals(newBalance, player.getBalance());
-        assertEquals(bankBalanceBefore + field.getPrice(), bank.getBalance());
-   }
 
     @Test
     public void OtherPlayerCantBuyOwnedField(){
@@ -143,7 +121,7 @@ class FieldTest {
         rent = 5;
         field.setRent(rent);
 
-        Field field2 = new HotelImpl();
+        Field field2 = Context.createField("hotel");
         field2.setFieldColor(Field.FieldColor.GREEN);
         field2.setBank(bank);
         field2.setPrice(70);

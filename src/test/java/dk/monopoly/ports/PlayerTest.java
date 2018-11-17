@@ -3,7 +3,6 @@ package dk.monopoly.ports;
 import dk.monopoly.MonopolyAccount;
 import dk.monopoly.MonopolyInfoService;
 import dk.monopoly.MonopolyPlayer;
-import dk.monopoly.common.Context;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,15 +12,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PlayerTest {
     private Player player;
-    FakeHand hand;
-    MonopolyInfoService MonopolyInfoService;
+    private FakeHand hand;
+    private MonopolyInfoService monopolyInfoService;
+    private Field field = null;
 
     @BeforeEach
     void setUp() {
         player = new MonopolyPlayer(new MonopolyAccount());
         player.setName("Jan");
         hand = new FakeHand();
-        MonopolyInfoService = (MonopolyInfoService) Context.createInfoService("DK");
+        monopolyInfoService = (MonopolyInfoService) Context.createInfoService("DK");
+        field = Context.createField("hotel");
     }
 
     @AfterEach
@@ -145,8 +146,8 @@ class PlayerTest {
         //arrange
         hand.setRoll(2);
         player.setHand(hand);
-        MonopolyInfoService.setPoints(2);
-        player.setInfoService(MonopolyInfoService);
+        monopolyInfoService.setPoints(2);
+        player.setInfoService(monopolyInfoService);
 
         int balance = player.getBalance() + 250;
 
@@ -164,8 +165,8 @@ class PlayerTest {
         //arrange
         hand.setRoll(3);
         player.setHand(hand);
-        MonopolyInfoService.setPoints(3);
-        player.setInfoService(MonopolyInfoService);
+        monopolyInfoService.setPoints(3);
+        player.setInfoService(monopolyInfoService);
 
         int balance = player.getBalance() - 100;
 
@@ -178,26 +179,38 @@ class PlayerTest {
         assertEquals("Du har fundet Crater og får -100 kr, du er ikke rig!", player.getMessage());
     }
 
-    private class FakeHand extends Hand{
+    @Test
+    public void playerBuyingAField(){
+        //arrange
+        int fieldPrice = 50;
+        field.setPrice(fieldPrice);
+        Bank bank = Context.createBank();
+        bank.addProperty(field);
+        int expectedBankBalanceAfterSell = fieldPrice + bank.getBalance();
 
+        int newBalance = player.getBalance() - field.getPrice();
+
+        //act
+        player.buy(field);
+
+        //assert
+        assertEquals(newBalance, player.getBalance());
+        assertEquals(expectedBankBalanceAfterSell, bank.getBalance());
+    }
+
+    private class FakeHand extends Hand{
         @Override
         public int roll() {
             return hand;
         }
-
         protected void setRoll(int roll){
             super.hand = roll;
         }
-
         @Override
-        public void setDice(Die[] dice) {
-
-        }
-
+        public void setDice(Die[] dice) { }
         @Override
         public int getDie(int index) {
             return 0;
         }
     }
-
 }
