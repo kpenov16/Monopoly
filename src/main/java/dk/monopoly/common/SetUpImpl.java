@@ -3,10 +3,11 @@ package dk.monopoly.common;
 import dk.monopoly.ports.Context;
 import dk.monopoly.ports.Player;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SetUpImpl {
     private SetUpPresenter setUpPresenter;
-    private Player player1;
-    private Player player2;
     private PlayerGateway playerGateway;
 
     public SetUpImpl(SetUpPresenter setUpPresenter, PlayerGateway playerGateway) {
@@ -14,16 +15,16 @@ public class SetUpImpl {
         this.playerGateway = playerGateway;
     }
 
-    public void execute(String nameFirstPlayer, String nameSecondPlayer) {
-        player1 = Context.createPlayer();
-        player1.setName(nameFirstPlayer);
-        playerGateway.addPlayer(player1);
+    public void execute(List<String> playersNames) {
+        List<Integer> balances = new ArrayList<>();
+        for (String name : playersNames){
+            Player p = Context.createPlayer(name);
+            playerGateway.addPlayer(p);
 
-        player2 = Context.createPlayer();
-        player2.setName(nameSecondPlayer);
-        playerGateway.addPlayer(player2);
+            balances.add(p.getBalance());
+        }
 
-        setUpPresenter.execute(player1.getBalance(),player2.getBalance());
+        setUpPresenter.execute(balances);
         setUpPresenter.sendSuccessMsg();
     }
 }

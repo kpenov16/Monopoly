@@ -7,75 +7,22 @@ import gui_main.GUI;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
 public class MonopolyGui {
-    private boolean isFirstPlyerTurn = true;
+    private int playerTurnIndex = 0;
     private SetUpViewModel setUpViewModel;
     private RollingDiceViewModel rollingDiceViewModel;
     private GUI_Player player1;
     private GUI_Player player2;
+    private List<GUI_Player> playersGui = new ArrayList<>();
     private GUI gui;
     private PlayerGateway playerGateway = new PlayerGateway();
-    private String nameFirstPlayer="";
-    private String nameSecondPlayer="";
-
-    class GetNumberOfPlayersCallable implements Callable<String> {
-        String msg = "";
-        public  GetNumberOfPlayersCallable(String msg){
-            this.msg = msg;
-        }
-        @Override
-        public String call() throws Exception {
-            //JFrame frame = new JFrame("Number of players");
-            //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-
-            //JLabel label = new JLabel("Choose number om players: ");
-            //label.setHorizontalAlignment(JLabel.LEFT);
-
-            //JPanel panel = new JPanel();
-            //panel.setVisible(true);
-            //panel.setOpaque(true);
-            final String[] selected = new String[]{""};
-
-            JComboBox<String> comboBox = new JComboBox<>(new String[]{"2","3","4"});
-            comboBox.setEditable(false);
-            comboBox.setVisible(true);
-            comboBox.addActionListener(new ActionListener(){
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    JComboBox cb = (JComboBox)e.getSource();
-                    selected[0] = (String)cb.getSelectedItem();
-                    System.out.println(selected[0]);
-                }
-            });
-
-            //panel.add(label);
-            //panel.add(comboBox);
-            //frame.setContentPane(panel);
-            //frame.pack();
-            //frame.setVisible(true);
-            Object[] options = new Object[]{};
-            JOptionPane optionPane = new JOptionPane("Select number of players",
-                                                        JOptionPane.QUESTION_MESSAGE,
-                                                        JOptionPane.DEFAULT_OPTION,
-                                                        null, options, null);
-            //JOptionPane.showInputDialog(msg);
-            optionPane.add(comboBox);
-            JDialog dialog = new JDialog();
-            dialog.getContentPane().add(optionPane);
-            dialog.pack();
-            dialog.setVisible(true);
-
-            return selected[1];//(String) comboBox.getSelectedItem();
-        }
-    }
+    List<String> playersNames = new ArrayList<>();
+    private int numberOfPlayers = 0;
 
     class GetPalyerNameCallable implements Callable<String> {
         String msg = "";
@@ -110,13 +57,13 @@ public class MonopolyGui {
     }
 
     private void evaluatePlayerTurn() {
-        if (isFirstPlyerTurn) {
-            rollingDiceViewModel.playerName = setUpViewModel.nameFirstPlayer;
-            isFirstPlyerTurn = false;
-        } else {
-            rollingDiceViewModel.playerName = setUpViewModel.nameSecondPlayer;
-            isFirstPlyerTurn = true;
-        }
+        rollingDiceViewModel.playerName = setUpViewModel.playersNames.get(playerTurnIndex++);
+    }
+
+    private int generateNextPlayerIndex() {
+        if(playerTurnIndex == numberOfPlayers)
+            playerTurnIndex = 0;
+        return playerTurnIndex;
     }
 
     private void executeRollingDiceUseCase() {
@@ -128,8 +75,7 @@ public class MonopolyGui {
 
     private void executeSetUpUseCase() {
         setUpViewModel = new SetUpViewModel();
-        setUpViewModel.nameFirstPlayer = nameFirstPlayer;
-        setUpViewModel.nameSecondPlayer = nameSecondPlayer;
+        setUpViewModel.playersNames = playersNames;
         SetUpPresenter setUpPresenter = new SetUpPresenter(this, setUpViewModel);
         SetUpImpl setUpImpl = new SetUpImpl(setUpPresenter, playerGateway);
         SetUpController setUpController = new SetUpController(setUpViewModel, setUpImpl);
@@ -150,7 +96,7 @@ public class MonopolyGui {
             JComboBox comboBox = new JComboBox(model);
             panel.add(comboBox);
 
-            int iResult = JOptionPane.showConfirmDialog(null, panel, "Players count", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+            int iResult = JOptionPane.showConfirmDialog(null, panel, "Players playerTurnIndex", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
             switch (iResult) {
                 case JOptionPane.OK_OPTION:
                     numberOfPlayers = (String) comboBox.getSelectedItem();
@@ -176,44 +122,114 @@ public class MonopolyGui {
         public String getResponse() {return response;}
     }
 
+    private class NameResponse implements Runnable{
+        private int playerIndex;
+        private String response;
+        public NameResponse(int playerIndex) {
+            this.playerIndex = playerIndex;
+        }
+        @Override
+        public void run() {
+            response = askForPlayerName(playerIndex);
+        }
+        public String getResponse() {return response;}
+    }
 
     private void setupPlayers() {
-        ExecutorService pool = null;//= Executors.newSingleThreadExecutor();
-        String playerCount = askForNumberOfPlayers("2","3","4");
-        System.out.println(playerCount);
-        /*
-        List<Future<String>> numberOfPlayers = new ArrayList<>();
-        Future<String> futureNumberOfPlayers = pool.submit(new GetNumberOfPlayersCallable("Choose number of players."));
-        numberOfPlayers.add(futureNumberOfPlayers);
-        String userChoicePlayerNumber = "";
-        try {
-            while (! pool.isTerminated()) {
-                pool.awaitTermination(1, TimeUnit.SECONDS);
-                System.out.println("waiting 1 SECONDS");
-            }
-            userChoicePlayerNumber = numberOfPlayers.get(0).get();
-            System.out.println(userChoicePlayerNumber);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-        */
-        pool = Executors.newFixedThreadPool(2);
-        List<Future<String>> names = new ArrayList<>();
-        Future<String> futureSecondPlayer = pool.submit(new GetPalyerNameCallable("Type the name of the second player."));
-        Future<String> futureFirstPlayer = pool.submit(new GetPalyerNameCallable("Type the name of the first player."));
-        names.add(futureFirstPlayer);
-        names.add(futureSecondPlayer);
+        numberOfPlayers = Integer.parseInt( askForNumberOfPlayers("2","3","4") );
+        //List<String> names = askForPlayersNames(playerIndex);
+        playersNames = askForNames(numberOfPlayers);
+    }
 
+    private List<String> askForNames(int numberOfPlayers) {
+        List<String> names = new ArrayList<>();
+        for (int i=0;i<numberOfPlayers;i++)
+            names.add(askForPlayerName(i));
+        return names;
+    }
+
+    private String askForPlayerName(int playerIndex) {
+        String name = "none " + (playerIndex+1);
+        if (EventQueue.isDispatchThread()) {
+            name = JOptionPane.showInputDialog("Type the name of player " + (playerIndex+1) + ": ");
+            return name;
+        } else {
+            NameResponse response = new NameResponse(playerIndex);
+            try {
+                SwingUtilities.invokeAndWait(response);
+                name = response.getResponse();
+            } catch (InterruptedException | InvocationTargetException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return name;
+        /*
+        ExecutorService pool = Executors.newFixedThreadPool(playerIndex);
+        List<Future<String>> futureNames = new ArrayList<>();
+        for (int i=0;i<playerIndex;i++){
+            Future<String> player = pool.submit(new GetPalyerNameCallable("Type the name of player " + (i+1) + ": "));
+            futureNames.add(player);
+        }
+
+        List<String> names = new ArrayList<>();
         try {
-            nameFirstPlayer = names.get(0).get();
-            nameSecondPlayer = names.get(1).get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
+            for (int i=0;i<playerIndex;i++)
+                names.add( futureNames.get(0).get() );
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
+        return names;
+        */
+    }
+
+
+    private List<String> askForPlayersNames(int numberOfPlayers) {
+        return null;
+        /*
+        if (EventQueue.isDispatchThread()) {
+            ExecutorService pool = Executors.newFixedThreadPool(numberOfPlayers);
+            List<Future<String>> futureNames = new ArrayList<>();
+            for (int i=0;i<numberOfPlayers;i++){
+                Future<String> player = pool.submit(new GetPalyerNameCallable("Type the name of player " + (i+1) + ": "));
+                futureNames.add(player);
+            }
+
+            List<String> names = new ArrayList<>();
+            try {
+                for (int i=0;i<numberOfPlayers;i++)
+                    names.add( futureNames.get(0).get() );
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+            return names;
+        } else {
+            Response response = new Response(numberOfPlayers);
+            try {
+                SwingUtilities.invokeAndWait(response);
+                numberOfPlayers = response.getResponse();
+            } catch (InterruptedException | InvocationTargetException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return numberOfPlayers;
+        */
+        /*
+        ExecutorService pool = Executors.newFixedThreadPool(playerIndex);
+        List<Future<String>> futureNames = new ArrayList<>();
+        for (int i=0;i<playerIndex;i++){
+            Future<String> player = pool.submit(new GetPalyerNameCallable("Type the name of player " + (i+1) + ": "));
+            futureNames.add(player);
+        }
+
+        List<String> names = new ArrayList<>();
+        try {
+            for (int i=0;i<playerIndex;i++)
+                names.add( futureNames.get(0).get() );
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        return names;
+        */
     }
 
     private void setupGUI() {
@@ -232,10 +248,8 @@ public class MonopolyGui {
         fields[1] = crater.getField();
 
         gui = new GUI(fields);
-        player1 = new GUI_Player(setUpViewModel.nameFirstPlayer, setUpViewModel.balanceFirstPlayer);
-        player2 = new GUI_Player(setUpViewModel.nameSecondPlayer, setUpViewModel.balanceSecondPlayer);
-        gui.addPlayer(player1);
-        gui.addPlayer(player2);
+        for(int i=0;i<numberOfPlayers;i++)
+            gui.addPlayer( new GUI_Player(setUpViewModel.playersNames.get(i), setUpViewModel.balancesPlayers.get(i)) );
     }
 
     public void sendSuccessMsg() {
@@ -248,11 +262,16 @@ public class MonopolyGui {
 
     public void update() {
         gui.setDice(rollingDiceViewModel.firstDie, rollingDiceViewModel.secondDie);
-        if(!isFirstPlyerTurn){
+
+        playerTurnIndex = generateNextPlayerIndex();
+        playersGui.get(playerTurnIndex).setBalance(rollingDiceViewModel.balance);
+
+        /*if(!isFirstPlyerTurn){
             player1.setBalance(rollingDiceViewModel.balance);
         }else{
             player2.setBalance(rollingDiceViewModel.balance);
-        }
+        }*/
+
         gui.showMessage(rollingDiceViewModel.msg);
     }
 

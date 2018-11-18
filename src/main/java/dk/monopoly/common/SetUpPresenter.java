@@ -1,5 +1,7 @@
 package dk.monopoly.common;
 
+import java.util.List;
+
 public class SetUpPresenter {
     private MonopolyGui monopolyGui;
     private SetUpViewModel vm;
@@ -9,15 +11,15 @@ public class SetUpPresenter {
         this.vm = vm;
     }
 
-
     public void sendSuccessMsg() {
-        vm.msg = "Successfully created players: " + vm.nameFirstPlayer + ", " + vm.nameSecondPlayer;
+        String msg = "Successfully created players: ";
+        for(String name : vm.playersNames)
+            msg += name + ", ";
+        vm.msg = msg.trim().substring(0,msg.length()-1);
         monopolyGui.sendSuccessMsg();
     }
 
-    public void execute(int balanceFirstPlayer, int balanceSecondPlayer) {
-        vm.balanceFirstPlayer = balanceFirstPlayer;
-        vm.balanceSecondPlayer = balanceSecondPlayer;
-
+    public void execute(List<Integer> balances) {
+        vm.balancesPlayers = balances;
     }
 }

@@ -10,6 +10,6 @@ public class SetUpController {
     }
 
     public void execute() {
-        setUpImpl.execute(vm.nameFirstPlayer, vm.nameSecondPlayer);
+        setUpImpl.execute(vm.playersNames);
     }
 }

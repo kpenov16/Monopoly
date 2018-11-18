@@ -26,6 +26,14 @@ public class Context {
         return p;
     }
 
+    public static Player createPlayer(String name){
+        MonopolyPlayer p = new MonopolyPlayer( Context.createAccount() );
+        p.setName(name);
+        p.setHand( Context.createHand(2) );
+        p.setInfoService(Context.createInfoService("DK"));
+        return p;
+    }
+
     public static Hand createHand(int diceNumber){
         Hand h = new HandImpl();
         Die[] dice = new Die[diceNumber];

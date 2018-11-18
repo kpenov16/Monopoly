@@ -1,9 +1,10 @@
 package dk.monopoly.common;
 
+import java.util.List;
+
 public class SetUpViewModel {
     public String msg;
-    public int balanceFirstPlayer;
-    public int balanceSecondPlayer;
-    String nameFirstPlayer;
-    String nameSecondPlayer;
+    List<Integer> balancesPlayers;
+    List<String> playersNames;
+
 }
