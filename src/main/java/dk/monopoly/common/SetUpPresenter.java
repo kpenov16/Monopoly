@@ -15,7 +15,7 @@ public class SetUpPresenter {
         String msg = "Successfully created players: ";
         for(String name : vm.playersNames)
             msg += name + ", ";
-        vm.msg = msg.trim().substring(0,msg.length()-1);
+        vm.msg = msg.trim().substring(0,msg.length()-2);
         monopolyGui.sendSuccessMsg();
     }
 
