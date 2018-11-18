@@ -10,7 +10,6 @@ import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
 
 public class MonopolyGui {
     private int playerTurnIndex = 0;
@@ -23,17 +22,6 @@ public class MonopolyGui {
     private PlayerGateway playerGateway = new PlayerGateway();
     List<String> playersNames = new ArrayList<>();
     private int numberOfPlayers = 0;
-
-    class GetPalyerNameCallable implements Callable<String> {
-        String msg = "";
-        public  GetPalyerNameCallable(String msg){
-            this.msg = msg;
-        }
-        @Override
-        public String call() throws Exception {
-            return JOptionPane.showInputDialog(msg);
-        }
-    }
 
     public void start() {
         setupPlayers();
@@ -103,20 +91,21 @@ public class MonopolyGui {
                     break;
             }
         } else {
-            Response response = new Response(values);
+            NumberPlayersResponse numberPlayersResponse = new NumberPlayersResponse(values);
             try {
-                SwingUtilities.invokeAndWait(response);
-                numberOfPlayers = response.getResponse();
+                SwingUtilities.invokeAndWait(numberPlayersResponse);
+                numberOfPlayers = numberPlayersResponse.getResponse();
             } catch (InterruptedException | InvocationTargetException ex) {
                 ex.printStackTrace();
             }
         }
         return numberOfPlayers;
     }
-    private class Response implements Runnable{
+
+    private class NumberPlayersResponse implements Runnable{
         private String[] values;
         private String response;
-        public Response(String... values) {this.values = values;}
+        public NumberPlayersResponse(String... values) {this.values = values;}
         @Override
         public void run() {response = askForNumberOfPlayers(values);}
         public String getResponse() {return response;}
@@ -137,7 +126,6 @@ public class MonopolyGui {
 
     private void setupPlayers() {
         numberOfPlayers = Integer.parseInt( askForNumberOfPlayers("2","3","4") );
-        //List<String> names = askForPlayersNames(playerIndex);
         playersNames = askForNames(numberOfPlayers);
     }
 
@@ -163,73 +151,6 @@ public class MonopolyGui {
             }
         }
         return name;
-        /*
-        ExecutorService pool = Executors.newFixedThreadPool(playerIndex);
-        List<Future<String>> futureNames = new ArrayList<>();
-        for (int i=0;i<playerIndex;i++){
-            Future<String> player = pool.submit(new GetPalyerNameCallable("Type the name of player " + (i+1) + ": "));
-            futureNames.add(player);
-        }
-
-        List<String> names = new ArrayList<>();
-        try {
-            for (int i=0;i<playerIndex;i++)
-                names.add( futureNames.get(0).get() );
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
-        return names;
-        */
-    }
-
-
-    private List<String> askForPlayersNames(int numberOfPlayers) {
-        return null;
-        /*
-        if (EventQueue.isDispatchThread()) {
-            ExecutorService pool = Executors.newFixedThreadPool(numberOfPlayers);
-            List<Future<String>> futureNames = new ArrayList<>();
-            for (int i=0;i<numberOfPlayers;i++){
-                Future<String> player = pool.submit(new GetPalyerNameCallable("Type the name of player " + (i+1) + ": "));
-                futureNames.add(player);
-            }
-
-            List<String> names = new ArrayList<>();
-            try {
-                for (int i=0;i<numberOfPlayers;i++)
-                    names.add( futureNames.get(0).get() );
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-            return names;
-        } else {
-            Response response = new Response(numberOfPlayers);
-            try {
-                SwingUtilities.invokeAndWait(response);
-                numberOfPlayers = response.getResponse();
-            } catch (InterruptedException | InvocationTargetException ex) {
-                ex.printStackTrace();
-            }
-        }
-        return numberOfPlayers;
-        */
-        /*
-        ExecutorService pool = Executors.newFixedThreadPool(playerIndex);
-        List<Future<String>> futureNames = new ArrayList<>();
-        for (int i=0;i<playerIndex;i++){
-            Future<String> player = pool.submit(new GetPalyerNameCallable("Type the name of player " + (i+1) + ": "));
-            futureNames.add(player);
-        }
-
-        List<String> names = new ArrayList<>();
-        try {
-            for (int i=0;i<playerIndex;i++)
-                names.add( futureNames.get(0).get() );
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
-        return names;
-        */
     }
 
     private void setupGUI() {
@@ -265,12 +186,6 @@ public class MonopolyGui {
 
         playerTurnIndex = generateNextPlayerIndex();
         playersGui.get(playerTurnIndex).setBalance(rollingDiceViewModel.balance);
-
-        /*if(!isFirstPlyerTurn){
-            player1.setBalance(rollingDiceViewModel.balance);
-        }else{
-            player2.setBalance(rollingDiceViewModel.balance);
-        }*/
 
         gui.showMessage(rollingDiceViewModel.msg);
     }
