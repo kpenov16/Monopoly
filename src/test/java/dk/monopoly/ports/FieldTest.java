@@ -1,8 +1,5 @@
 package dk.monopoly.ports;
 
-import dk.monopoly.BankImpl;
-import dk.monopoly.HotelImpl;
-import dk.monopoly.MonopolyAccount;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -171,6 +168,12 @@ class FieldTest {
         }
         @Override
         public void play() { }
+
+        @Override
+        public void roll() {
+
+        }
+
         @Override
         protected void setHand(Hand hand) { }
         @Override
@@ -191,6 +194,21 @@ class FieldTest {
         @Override
         public boolean ownsTwoFields(Field.FieldColor fieldColor) {
             return false;
+        }
+
+        @Override
+        public int getCurrentFieldIndex() {
+            return 0;
+        }
+
+        @Override
+        public void setCurrentField(Field field) {
+
+        }
+
+        @Override
+        public void addToBalance(int addend) {
+
         }
     }
 }

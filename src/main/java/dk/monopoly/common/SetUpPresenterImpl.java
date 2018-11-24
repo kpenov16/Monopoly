@@ -1,12 +1,14 @@
 package dk.monopoly.common;
 
+import dk.monopoly.ports.SetUpPresenter;
+
 import java.util.List;
 
-public class SetUpPresenter {
+public class SetUpPresenterImpl implements SetUpPresenter {
     private MonopolyGui monopolyGui;
     private SetUpViewModel vm;
 
-    public SetUpPresenter(MonopolyGui monopolyGui, SetUpViewModel vm) {
+    public SetUpPresenterImpl(MonopolyGui monopolyGui, SetUpViewModel vm) {
         this.monopolyGui = monopolyGui;
         this.vm = vm;
     }

@@ -1,7 +1,26 @@
 package dk.monopoly.ports;
 
 public abstract class Field {
+    protected static int currentFieldIndex = 0;
+    private int index=-1;
+    public int getIndex(){return index;}
+    protected void setIndex(int index){this.index = index;}
+
+    public String getLandlordName(){
+        return (owner == null)?null:owner.getName();
+    }
+
+    public Integer getLandlordBalance(){
+        return (owner==null)?null:owner.getBalance();
+    }
+
     public enum FieldColor{
+        WHITE{
+            @Override
+            public String toString() {
+                return "white";
+            }
+        },
         RED{
             @Override
             public String toString() {
@@ -14,7 +33,44 @@ public abstract class Field {
                 return "green";
             }
         },
-        NONE
+        ORANGE{
+            @Override
+            public String toString() {
+                return "orange";
+            }
+        },
+        NONE,
+        CYAN{
+            @Override
+            public String toString() {
+                return "cyan";
+            }
+        },
+        MAGENTA{
+            @Override
+            public String toString() {
+                return "magenta";
+            }
+        },
+        PINK{
+            @Override
+            public String toString() {
+                return "pink";
+            }
+        },
+        YELLOW{
+            @Override
+            public String toString() {
+                return "yellow";
+            }
+        },
+        BLUE{
+            @Override
+            public String toString() {
+                return "blue";
+            }
+        };
+
     }
     private FieldColor fieldColor;
     private Player owner;

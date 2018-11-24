@@ -114,6 +114,11 @@ class AccountTest {
         }
 
         @Override
+        public void roll() {
+
+        }
+
+        @Override
         public void setHand(Hand hand) {
 
         }
@@ -141,6 +146,21 @@ class AccountTest {
         @Override
         public boolean ownsTwoFields(Field.FieldColor fieldColor) {
             return false;
+        }
+
+        @Override
+        public int getCurrentFieldIndex() {
+            return 0;
+        }
+
+        @Override
+        public void setCurrentField(Field field) {
+
+        }
+
+        @Override
+        public void addToBalance(int addend) {
+
         }
     }
 

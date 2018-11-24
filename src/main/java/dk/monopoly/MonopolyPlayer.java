@@ -7,8 +7,8 @@ import java.util.List;
 
 public class MonopolyPlayer extends Player {
     protected Account account;
-    private List<Field> fields = new ArrayList<>();
-
+    private List<Field> ownedFields = new ArrayList<>();
+    private Field currentField = null;
     public MonopolyPlayer(Account account){
         setAccount(account);
     }
@@ -65,6 +65,11 @@ public class MonopolyPlayer extends Player {
     }
 
     @Override
+    public void roll(){
+        hand.roll();
+    }
+
+    @Override
     public void setHand(Hand hand) {
         super.hand = hand;
     }
@@ -87,20 +92,35 @@ public class MonopolyPlayer extends Player {
     @Override
     public void buy(Field field) {
         account.subtract(field.getPrice());
-        this.fields.add(field);
+        this.ownedFields.add(field);
         field.setBuyer(this);
     }
 
     @Override
     public boolean ownsTwoFields(Field.FieldColor fieldColor) {
         int counts = 0;
-        for(Field f : fields){
+        for(Field f : ownedFields){
             if(f.getFieldColor().toString().equals(fieldColor.toString())) {
                 if(++counts == 2)
                     return true;
             }
         }
         return false;
+    }
+
+    @Override
+    public int getCurrentFieldIndex() {
+        return currentField.getIndex();
+    }
+
+    @Override
+    public void setCurrentField(Field field) {
+        this.currentField = field;
+    }
+
+    @Override
+    public void addToBalance(int addend) {
+        account.add(addend);
     }
 
 

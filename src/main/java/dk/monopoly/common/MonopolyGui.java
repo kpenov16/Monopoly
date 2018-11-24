@@ -1,15 +1,18 @@
 package dk.monopoly.common;
 
-import gui_fields.GUI_Field;
-import gui_fields.GUI_Player;
-import gui_fields.GUI_Street;
+import dk.monopoly.ports.Context;
+import gui_codebehind.GUI_Center;
+import gui_codebehind.GUI_FieldFactory;
+import gui_fields.*;
 import gui_main.GUI;
 
 import javax.swing.*;
 import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MonopolyGui {
     private int playerTurnIndex = 0;
@@ -18,10 +21,15 @@ public class MonopolyGui {
     private GUI_Player player1;
     private GUI_Player player2;
     private List<GUI_Player> playersGui = new ArrayList<>();
+    private Map<String, GUI_Player> playersByName = new HashMap<>();
     private GUI gui;
-    private PlayerGateway playerGateway = new PlayerGateway();
+    private PlayerGatewayImpl playerGatewayImpl = new PlayerGatewayImpl();
+    private FieldGatewayImpl fieldGatewayImpl = new FieldGatewayImpl();
     List<String> playersNames = new ArrayList<>();
     private int numberOfPlayers = 0;
+    private Map<String,BoardField> fieldsMap = new HashMap<>();
+    private GUI_Field[] fields = new GUI_Field[24];
+    private List<Integer> playersBoardIndexes = new ArrayList<>();
 
     public void start() {
         setupPlayers();
@@ -32,8 +40,13 @@ public class MonopolyGui {
             evaluatePlayerTurn();
             askPlayerToRoll();
             executeRollingDiceUseCase();
+            resetViewModel();
         }
         notifyTheWinner(rollingDiceViewModel.playerName + ". You won the game!");
+    }
+
+    private void resetViewModel() {
+        rollingDiceViewModel = new RollingDiceViewModel();
     }
 
     private boolean isWinner() {
@@ -45,7 +58,7 @@ public class MonopolyGui {
     }
 
     private void evaluatePlayerTurn() {
-        rollingDiceViewModel.playerName = setUpViewModel.playersNames.get(playerTurnIndex++);
+        rollingDiceViewModel.playerName = setUpViewModel.playersNames.get(playerTurnIndex);
     }
 
     private int generateNextPlayerIndex() {
@@ -56,7 +69,7 @@ public class MonopolyGui {
 
     private void executeRollingDiceUseCase() {
         RollingDicePresenter rollingDicePresenter = new RollingDicePresenter(this, rollingDiceViewModel);
-        RollingDiceImpl rollingDiceImpl = new RollingDiceImpl(rollingDicePresenter, playerGateway);
+        RollingDiceImpl rollingDiceImpl = new RollingDiceImpl(rollingDicePresenter, playerGatewayImpl, fieldGatewayImpl);
         RollingDiceController rollingDiceController = new RollingDiceController(rollingDiceViewModel, rollingDiceImpl);
         rollingDiceController.execute();
     }
@@ -64,8 +77,8 @@ public class MonopolyGui {
     private void executeSetUpUseCase() {
         setUpViewModel = new SetUpViewModel();
         setUpViewModel.playersNames = playersNames;
-        SetUpPresenter setUpPresenter = new SetUpPresenter(this, setUpViewModel);
-        SetUpImpl setUpImpl = new SetUpImpl(setUpPresenter, playerGateway);
+        SetUpPresenterImpl setUpPresenterImpl = new SetUpPresenterImpl(this, setUpViewModel);
+        SetUpImpl setUpImpl = new SetUpImpl(setUpPresenterImpl, playerGatewayImpl, fieldGatewayImpl);
         SetUpController setUpController = new SetUpController(setUpViewModel, setUpImpl);
         setUpController.execute();
     }
@@ -154,8 +167,112 @@ public class MonopolyGui {
     }
 
     private void setupGUI() {
-        GUI_Field[] fields = new GUI_Field[40];
+
         GUI.setNull_fields_allowed(true);
+
+        StartField start = new StartField();
+        fields[0] = start.getField();
+        fieldsMap.put(start.getTitle(),start);
+
+        BurgerField burger = new BurgerField();
+        fields[1] = burger.getField();
+        fieldsMap.put(burger.getTitle(),burger);
+
+        PizzaField pizza = new PizzaField();
+        fields[2] = pizza.getField();
+        fieldsMap.put(pizza.getTitle(),pizza);
+
+        ChanceField chance1 = new ChanceField();
+        chance1.setTitle("Chance 1");
+        fields[3] = chance1.getField();
+        fieldsMap.put(chance1.getTitle(),chance1);
+
+        IceCreamStoreField iceCreamStore = new IceCreamStoreField();
+        fields[4] = iceCreamStore.getField();
+        fieldsMap.put(iceCreamStore.getTitle(),iceCreamStore);
+
+        CandyStoreField candyStore = new CandyStoreField();
+        fields[5] = candyStore.getField();
+        fieldsMap.put(candyStore.getTitle(),candyStore);
+
+        PrisonGuestField prisonGuest = new PrisonGuestField();
+        fields[6] = prisonGuest.getField();
+        fieldsMap.put(prisonGuest.getTitle(),prisonGuest);
+
+        MuseumField museum = new MuseumField();
+        fields[7] = museum.getField();
+        fieldsMap.put(museum.getTitle(),museum);
+
+        LibraryField library = new LibraryField();
+        fields[8] = library.getField();
+        fieldsMap.put(library.getTitle(),library);
+
+
+        ChanceField chance2 = new ChanceField();
+        chance2.setTitle("Chance 2");
+        fields[9] = chance2.getField();
+        fieldsMap.put(chance2.getTitle(),chance2);
+
+
+        SkateParkField skatePark = new SkateParkField();
+        fields[10] = skatePark.getField();
+        fieldsMap.put(skatePark.getTitle(),skatePark);
+
+        SwimmingPoolField swimmingPool = new SwimmingPoolField();
+        fields[11] = swimmingPool.getField();
+        fieldsMap.put(swimmingPool.getTitle(),swimmingPool);
+
+        ParkingField parking = new ParkingField();
+        fields[12] = parking.getField();
+        fieldsMap.put(parking.getTitle(),parking);
+
+        TheaterField theater = new TheaterField();
+        fields[13] = theater.getField();
+        fieldsMap.put(theater.getTitle(),theater);
+
+        CinemaField cinema = new CinemaField();
+        fields[14] = cinema.getField();
+        fieldsMap.put(cinema.getTitle(),cinema);
+
+        ChanceField chance3 = new ChanceField();
+        chance3.setTitle("Chance 3");
+        fields[15] = chance3.getField();
+        fieldsMap.put(chance3.getTitle(),chance3);
+
+        ToyStoreField toyStore = new ToyStoreField();
+        fields[16] = toyStore.getField();
+        fieldsMap.put(toyStore.getTitle(),toyStore);
+
+        PetShopField petShop = new PetShopField();
+        fields[17] = petShop.getField();
+        fieldsMap.put(petShop.getTitle(),petShop);
+
+        PrisonField prison = new PrisonField();
+        fields[18] = prison.getField();
+        fieldsMap.put(prison.getTitle(),prison);
+
+        BowlingField bowling = new BowlingField();
+        fields[19] = bowling.getField();
+        fieldsMap.put(bowling.getTitle(),bowling);
+
+        ZooField zoo = new ZooField();
+        fields[20] = zoo.getField();
+        fieldsMap.put(zoo.getTitle(),zoo);
+
+        ChanceField chance4 = new ChanceField();
+        chance4.setTitle("Chance 4");
+        fields[21] = chance4.getField();
+        fieldsMap.put(chance4.getTitle(),chance4);
+
+        WaterParkField waterPark = new WaterParkField();
+        fields[22] = waterPark.getField();
+        fieldsMap.put(waterPark.getTitle(),waterPark);
+
+        SeafrontField seafront = new SeafrontField();
+        fields[23] = seafront.getField();
+        fieldsMap.put(seafront.getTitle(),seafront);
+
+        /*
         Field tower = new Field();
         tower.setTitle("Tower");
         tower.setRent("250,+");
@@ -167,10 +284,26 @@ public class MonopolyGui {
         crater.setRent("100,-");
         crater.setDescription("Crater, you lose " + 100 + "kr.!");
         fields[1] = crater.getField();
-
+        */
         gui = new GUI(fields);
-        for(int i=0;i<numberOfPlayers;i++)
-            gui.addPlayer( new GUI_Player(setUpViewModel.playersNames.get(i), setUpViewModel.balancesPlayers.get(i)) );
+        for(int i=0;i<numberOfPlayers;i++) {
+            GUI_Player player = new GUI_Player(setUpViewModel.playersNames.get(i), setUpViewModel.balancesPlayers.get(i));
+            gui.addPlayer(player);
+            fields[0].setCar(player,true);
+
+            playersBoardIndexes.add(0);
+
+            playersGui.add(player);
+            playersByName.put(player.getName(),player);
+        }
+
+        /*
+        System.out.println( gui.getUserString("type something") );
+        boolean selection = gui.getUserLeftButtonPressed("vælg Ja eller nej","Ja","Nej");
+        System.out.println( selection );
+        int tal = gui.getUserInteger("Vælg et tal");
+        System.out.println( tal );*/
+
     }
 
     public void sendSuccessMsg() {
@@ -180,16 +313,28 @@ public class MonopolyGui {
     private void askPlayerToRoll(){
         String buttonName = gui.getUserButtonPressed("It's your turn " + rollingDiceViewModel.playerName, "Roll");
     }
-
     public void update() {
         gui.setDice(rollingDiceViewModel.firstDie, rollingDiceViewModel.secondDie);
 
+        GUI_Player player = playersGui.get(playerTurnIndex);
+        fields[playersBoardIndexes.get(playerTurnIndex)].setCar(player,false);
+        playersBoardIndexes.set(playerTurnIndex, rollingDiceViewModel.currentFieldIndex);
+        fields[playersBoardIndexes.get(playerTurnIndex)].setCar(player,true);
+        //fields[0].removeAllCars();
+
+        playersGui.get(playerTurnIndex++).setBalance(rollingDiceViewModel.balance);
         playerTurnIndex = generateNextPlayerIndex();
-        playersGui.get(playerTurnIndex).setBalance(rollingDiceViewModel.balance);
 
         gui.showMessage(rollingDiceViewModel.msg);
+
+        if(hasPlayerPaidRent())
+            playersByName.get(rollingDiceViewModel.landlordName).setBalance(rollingDiceViewModel.landlordBalance);
+
     }
 
+    private boolean hasPlayerPaidRent() {
+        return rollingDiceViewModel.playerPaysRent != null && rollingDiceViewModel.playerPaysRent==true;
+    }
 
     public class Field {
         GUI_Street field;
@@ -220,5 +365,717 @@ public class MonopolyGui {
         void setDescription(String description) {
             field.setDescription(description);
         }
+    }
+    private abstract class BoardField {
+
+    }
+    private class ParkingField extends BoardField{
+        private GUI_Brewery field;
+        public ParkingField(){
+            field = new GUI_Brewery();
+            setTitle("Parking");
+            setBackGroundColor(Color.WHITE);
+            setDescription("Parking description here");
+            setSubText("subtext here");
+        }
+
+        private void setSubText(String subtext) {
+            field.setSubText(subtext);
+        }
+        private void setBackGroundColor(Color color) {
+            field.setBackGroundColor(color);
+        }
+
+        void setTitle(String title) {
+            field.setTitle(title);
+        }
+
+        String getTitle() {
+            return field.getTitle();
+        }
+
+        GUI_Brewery getField() {
+            return field;
+        }
+
+        void setDescription(String description) {
+            field.setDescription(description);
+        }
+    }
+    private class SkateParkField extends BoardField{
+        private GUI_Street field;
+        public SkateParkField(){
+            field = new GUI_Street();
+            setTitle("Skate Park");
+            setBackGroundColor(Color.PINK);
+            setDescription("Skate Park description here");
+            setSubText("subtext here");
+        }
+
+        private void setSubText(String subtext) {
+            field.setSubText(subtext);
+        }
+        private void setBackGroundColor(Color color) {
+            field.setBackGroundColor(color);
+        }
+
+        void setTitle(String title) {
+            field.setTitle(title);
+        }
+
+        String getTitle() {
+            return field.getTitle();
+        }
+
+        GUI_Street getField() {
+            return field;
+        }
+
+        void setDescription(String description) {
+            field.setDescription(description);
+        }
+    }
+    private class SwimmingPoolField extends BoardField{
+        private GUI_Street field;
+        public SwimmingPoolField(){
+            field = new GUI_Street();
+            setTitle("Swimming Pool");
+            setBackGroundColor(Color.PINK);
+            setDescription("Swimming Pool description here");
+            setSubText("subtext here");
+        }
+
+        private void setSubText(String subtext) {
+            field.setSubText(subtext);
+        }
+        private void setBackGroundColor(Color color) {
+            field.setBackGroundColor(color);
+        }
+
+        void setTitle(String title) {
+            field.setTitle(title);
+        }
+
+        String getTitle() {
+            return field.getTitle();
+        }
+
+        GUI_Street getField() {
+            return field;
+        }
+
+        void setDescription(String description) {
+            field.setDescription(description);
+        }
+    }
+    private class LibraryField extends BoardField{
+        private GUI_Street field;
+        public LibraryField(){
+            field = new GUI_Street();
+            setTitle("Library");
+            setBackGroundColor(Color.MAGENTA);
+            setDescription("Library description here");
+            setSubText("subtext here");
+        }
+
+        private void setSubText(String subtext) {
+            field.setSubText(subtext);
+        }
+        private void setBackGroundColor(Color color) {
+            field.setBackGroundColor(color);
+        }
+
+        void setTitle(String title) {
+            field.setTitle(title);
+        }
+
+        String getTitle() {
+            return field.getTitle();
+        }
+
+        GUI_Street getField() {
+            return field;
+        }
+
+        void setDescription(String description) {
+            field.setDescription(description);
+        }
+    }
+    private class MuseumField extends BoardField{
+        private GUI_Street field;
+        public MuseumField(){
+            field = new GUI_Street();
+            setTitle("Museum");
+            setBackGroundColor(Color.MAGENTA);
+            setDescription("Museum description here");
+            setSubText("subtext here");
+        }
+
+        private void setSubText(String subtext) {
+            field.setSubText(subtext);
+        }
+        private void setBackGroundColor(Color color) {
+            field.setBackGroundColor(color);
+        }
+
+        void setTitle(String title) {
+            field.setTitle(title);
+        }
+
+        String getTitle() {
+            return field.getTitle();
+        }
+
+        GUI_Street getField() {
+            return field;
+        }
+
+        void setDescription(String description) {
+            field.setDescription(description);
+        }
+    }
+    private class PrisonGuestField extends BoardField{
+        private GUI_Refuge field;
+        public PrisonGuestField(){
+            field = new GUI_Refuge();
+            setTitle("Prison Guest");
+            setBackGroundColor(Color.WHITE);
+            setDescription("Prison Guest description here");
+            setSubText("subtext here");
+        }
+
+        private void setSubText(String subtext) {
+            field.setSubText(subtext);
+        }
+
+        private void setBackGroundColor(Color color) {
+            field.setBackGroundColor(color);
+        }
+
+        void setTitle(String title) {
+            field.setTitle(title);
+        }
+
+        String getTitle() {
+            return field.getTitle();
+        }
+
+        GUI_Refuge getField() {
+            return field;
+        }
+
+        void setDescription(String description) {
+            field.setDescription(description);
+        }
+    }
+    private class IceCreamStoreField extends BoardField{
+        private GUI_Street field;
+        public IceCreamStoreField(){
+            field = new GUI_Street();
+            setTitle("Ice Cream Store");
+            setBackGroundColor(Color.CYAN);
+            setDescription("Ice Cream Store description here");
+            setSubText("subtext here");
+        }
+
+        private void setSubText(String subtext) {
+            field.setSubText(subtext);
+        }
+
+        private void setBackGroundColor(Color color) {
+            field.setBackGroundColor(color);
+        }
+
+        void setTitle(String title) {
+            field.setTitle(title);
+        }
+
+        String getTitle() {
+            return field.getTitle();
+        }
+
+        GUI_Street getField() {
+            return field;
+        }
+
+        void setDescription(String description) {
+            field.setDescription(description);
+        }
+    }
+    private class CandyStoreField extends BoardField{
+        private GUI_Street field;
+        public CandyStoreField(){
+            field = new GUI_Street();
+            setTitle("Candy Store");
+            setBackGroundColor(Color.CYAN);
+            setDescription("Candy Store description here");
+            setSubText("subtext here");
+        }
+
+        private void setSubText(String subtext) {
+            field.setSubText(subtext);
+        }
+
+        private void setBackGroundColor(Color color) {
+            field.setBackGroundColor(color);
+        }
+
+        void setTitle(String title) {
+            field.setTitle(title);
+        }
+
+        String getTitle() {
+            return field.getTitle();
+        }
+
+        GUI_Street getField() {
+            return field;
+        }
+
+        void setDescription(String description) {
+            field.setDescription(description);
+        }
+    }
+    private class PizzaField extends BoardField{
+        private GUI_Street field;
+        public PizzaField(){
+            field = new GUI_Street();
+            setTitle("Pizza");
+            setBackGroundColor(Color.orange);
+            setDescription("Pizza description here");
+            setSubText("subtext here");
+        }
+
+        private void setSubText(String subtext) {
+            field.setSubText(subtext);
+        }
+
+        private void setBackGroundColor(Color color) {
+            field.setBackGroundColor(color);
+        }
+
+        void setTitle(String title) {
+            field.setTitle(title);
+        }
+
+        String getTitle() {
+            return field.getTitle();
+        }
+
+        GUI_Street getField() {
+            return field;
+        }
+
+        void setDescription(String description) {
+            field.setDescription(description);
+        }
+    }
+    private class BurgerField extends BoardField{
+        private GUI_Street field;
+        public BurgerField(){
+            field = new GUI_Street();
+            setTitle("Burger");
+            setBackGroundColor(Color.orange);
+            setDescription("Burger description here");
+            setSubText("subtext here");
+        }
+
+        private void setSubText(String subtext) {
+            field.setSubText(subtext);
+        }
+
+        private void setBackGroundColor(Color color) {
+            field.setBackGroundColor(color);
+        }
+
+        void setTitle(String title) {
+            field.setTitle(title);
+        }
+
+        String getTitle() {
+            return field.getTitle();
+        }
+
+        GUI_Street getField() {
+            return field;
+        }
+
+        void setDescription(String description) {
+            field.setDescription(description);
+        }
+    }
+    private class SeafrontField extends BoardField{
+        private GUI_Street field;
+        public SeafrontField(){
+            field = new GUI_Street();
+            setTitle("Seafront");
+            setBackGroundColor(Color.BLUE);
+            setDescription("Seafront description here");
+            setSubText("subtext here");
+        }
+
+        private void setSubText(String subtext) {
+            field.setSubText(subtext);
+        }
+
+        private void setBackGroundColor(Color color) {
+            field.setBackGroundColor(color);
+        }
+
+        void setTitle(String title) {
+            field.setTitle(title);
+        }
+
+        String getTitle() {
+            return field.getTitle();
+        }
+
+        GUI_Street getField() {
+            return field;
+        }
+
+        void setDescription(String description) {
+            field.setDescription(description);
+        }
+    }
+    private class WaterParkField extends BoardField{
+        private GUI_Street field;
+        public WaterParkField(){
+            field = new GUI_Street();
+            setTitle("Water Park");
+            setBackGroundColor(Color.BLUE);
+            setDescription("Water Park description here");
+            setSubText("subtext here");
+        }
+
+        private void setSubText(String subtext) {
+            field.setSubText(subtext);
+        }
+
+        private void setBackGroundColor(Color color) {
+            field.setBackGroundColor(color);
+        }
+
+        void setTitle(String title) {
+            field.setTitle(title);
+        }
+
+        String getTitle() {
+            return field.getTitle();
+        }
+
+        GUI_Street getField() {
+            return field;
+        }
+
+        void setDescription(String description) {
+            field.setDescription(description);
+        }
+    }
+    private class ZooField extends BoardField{
+        private GUI_Street field;
+        public ZooField(){
+            field = new GUI_Street();
+            setTitle("Zoo");
+            setBackGroundColor(Color.GREEN);
+            setDescription("Zoo description here");
+            setSubText("subtext here");
+        }
+
+        private void setSubText(String subtext) {
+            field.setSubText(subtext);
+        }
+
+        private void setBackGroundColor(Color color) {
+            field.setBackGroundColor(color);
+        }
+
+        void setTitle(String title) {
+            field.setTitle(title);
+        }
+
+        String getTitle() {
+            return field.getTitle();
+        }
+
+        GUI_Street getField() {
+            return field;
+        }
+
+        void setDescription(String description) {
+            field.setDescription(description);
+        }
+    }
+    private class BowlingField extends BoardField{
+        private GUI_Street field;
+        public BowlingField(){
+            field = new GUI_Street();
+            setTitle("Bowling");
+            setBackGroundColor(Color.GREEN);
+            setDescription("Bowling description here");
+            setSubText("subtext here");
+        }
+
+        private void setSubText(String subtext) {
+            field.setSubText(subtext);
+        }
+
+        private void setBackGroundColor(Color color) {
+            field.setBackGroundColor(color);
+        }
+
+        void setTitle(String title) {
+            field.setTitle(title);
+        }
+
+        String getTitle() {
+            return field.getTitle();
+        }
+
+        GUI_Street getField() {
+            return field;
+        }
+
+        void setDescription(String description) {
+            field.setDescription(description);
+        }
+    }
+    private class PrisonField extends BoardField{
+        private GUI_Jail field;
+        public PrisonField(){
+            field = new GUI_Jail();
+            setTitle("Prison");
+            setBackGroundColor(Color.WHITE);
+            setDescription("Prison description here");
+            setSubText("subtext here");
+        }
+
+        private void setSubText(String subtext) {
+            field.setSubText(subtext);
+        }
+
+        private void setBackGroundColor(Color color) {
+            field.setBackGroundColor(color);
+        }
+
+        void setTitle(String title) {
+            field.setTitle(title);
+        }
+
+        String getTitle() {
+            return field.getTitle();
+        }
+
+        GUI_Jail getField() {
+            return field;
+        }
+
+        void setDescription(String description) {
+            field.setDescription(description);
+        }
+    }
+    private class ChanceField extends BoardField{
+        private GUI_Chance field;
+        public ChanceField(){
+            field = new GUI_Chance();
+            setTitle("Chance");
+            setBackGroundColor(Color.white);
+            setDescription("Chance description here");
+            setSubText("Subtext here");
+        }
+
+        private void setSubText(String subtext) {
+            field.setSubText(subtext);
+        }
+
+        private void setBackGroundColor(Color color) {
+            field.setBackGroundColor(color);
+        }
+
+        void setTitle(String title) {
+            field.setTitle(title);
+        }
+
+        String getTitle() {
+            return field.getTitle();
+        }
+
+        GUI_Chance getField() {
+            return field;
+        }
+
+        void setDescription(String description) {
+            field.setDescription(description);
+        }
+    }
+    private class PetShopField extends BoardField{
+        private GUI_Street field;
+        public PetShopField(){
+            field = new GUI_Street();
+            setTitle("Pet Shop");
+            setBackGroundColor(Color.YELLOW);
+            setDescription("Pet Shop description here");
+            setSubText("subtext here");
+        }
+
+        private void setSubText(String subtext) {
+            field.setSubText(subtext);
+        }
+
+        private void setBackGroundColor(Color color) {
+            field.setBackGroundColor(color);
+        }
+
+        void setTitle(String title) {
+            field.setTitle(title);
+        }
+
+        String getTitle() {
+            return field.getTitle();
+        }
+
+        GUI_Street getField() {
+            return field;
+        }
+
+        void setDescription(String description) {
+            field.setDescription(description);
+        }
+    }
+    private class ToyStoreField extends BoardField{
+        private GUI_Street field;
+        public ToyStoreField(){
+            field = new GUI_Street();
+            setTitle("Toy Store");
+            setBackGroundColor(Color.YELLOW);
+            setDescription("Toy Store description here");
+            setSubText("subtext here");
+        }
+
+        private void setSubText(String subtext) {
+            field.setSubText(subtext);
+        }
+
+        private void setBackGroundColor(Color color) {
+            field.setBackGroundColor(color);
+        }
+
+        void setTitle(String title) {
+            field.setTitle(title);
+        }
+
+        String getTitle() {
+            return field.getTitle();
+        }
+
+        GUI_Street getField() {
+            return field;
+        }
+
+        void setDescription(String description) {
+            field.setDescription(description);
+        }
+    }
+    private class CinemaField extends BoardField{
+        private GUI_Street field;
+        public CinemaField(){
+            field = new GUI_Street();
+            setTitle("Cinema");
+            setBackGroundColor(Color.RED);
+            setDescription("Cinema description here");
+            setSubText("subtext here");
+        }
+
+        private void setSubText(String subtext) {
+            field.setSubText(subtext);
+        }
+
+        private void setBackGroundColor(Color color) {
+            field.setBackGroundColor(color);
+        }
+
+        void setTitle(String title) {
+            field.setTitle(title);
+        }
+
+        String getTitle() {
+            return field.getTitle();
+        }
+
+        GUI_Street getField() {
+            return field;
+        }
+
+        void setDescription(String description) {
+            field.setDescription(description);
+        }
+    }
+    private class TheaterField extends BoardField{
+        private GUI_Street field;
+        public TheaterField(){
+            field = new GUI_Street();
+            setTitle("Theater");
+            setBackGroundColor(Color.RED);
+            setDescription("Theater description here");
+            setSubText("subtext here");
+        }
+
+        private void setSubText(String subtext) {
+            field.setSubText(subtext);
+        }
+        private void setBackGroundColor(Color color) {
+            field.setBackGroundColor(color);
+        }
+
+        void setTitle(String title) {
+            field.setTitle(title);
+        }
+
+        String getTitle() {
+            return field.getTitle();
+        }
+
+        GUI_Street getField() {
+            return field;
+        }
+
+        void setDescription(String description) {
+            field.setDescription(description);
+        }
+    }
+    private class StartField extends BoardField{
+        private GUI_Start field;
+
+        public StartField() {
+            field = new GUI_Start();
+            setTitle("Start");
+            setBackGroundColor(Color.WHITE);
+            setDescription("Starting point");
+            setSubText("subtext here");
+        }
+
+        private void setSubText(String subtext) {
+            field.setSubText(subtext);
+        }
+        private void setBackGroundColor(Color color) {
+            field.setBackGroundColor(color);
+        }
+
+        void setTitle(String title) {
+            field.setTitle(title);
+        }
+
+        String getTitle() {
+            return field.getTitle();
+        }
+
+        GUI_Start getField() {
+            return field;
+        }
+
+        void setDescription(String description) {
+            field.setDescription(description);
+        }
+
     }
 }

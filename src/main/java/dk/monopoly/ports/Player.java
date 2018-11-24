@@ -18,6 +18,8 @@ public abstract class Player extends Owner{
 
     public abstract void play();
 
+    public abstract void roll();
+
     protected abstract void setHand(Hand hand);
 
     public abstract String getLocation();
@@ -29,4 +31,9 @@ public abstract class Player extends Owner{
     public abstract void buy(Field field);
 
     public abstract boolean ownsTwoFields(Field.FieldColor fieldColor);
+
+    public abstract int getCurrentFieldIndex();
+    public abstract void setCurrentField(Field field);
+
+    public abstract void addToBalance(int addend);
 }
