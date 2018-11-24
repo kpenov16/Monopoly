@@ -5,7 +5,7 @@ import dk.monopoly.ports.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MonopolyPlayer extends Player {
+public class MonopolyPlayer  extends Player{
     protected Account account;
     private List<Field> ownedFields = new ArrayList<>();
     private Field currentField = null;
@@ -127,6 +127,25 @@ public class MonopolyPlayer extends Player {
     public void pay(Player payee, int amount) {
         account.subtract(amount);
         payee.addToBalance(amount);
+    }
+
+    @Override
+    public void pay(String bankName, int sum) {
+        if( bankName.equals(bank.getName()) ){
+            account.subtract(sum);
+            bank.pay(sum);
+        }
+
+    }
+
+    @Override
+    public void setChanceCard(ChanceCard chanceCard) {
+        super.chanceCard = chanceCard;
+    }
+
+    @Override
+    public void setBank(Bank bank) {
+        super.bank = bank;
     }
 
 

@@ -200,5 +200,20 @@ class FieldTest {
         public void addToBalance(int addend) { }
         @Override
         public void pay(Player player, int i) { }
+
+        @Override
+        public void pay(String bankName, int sum) {
+
+        }
+
+        @Override
+        public void setChanceCard(ChanceCard chanceCard) {
+
+        }
+
+        @Override
+        public void setBank(Bank bank) {
+
+        }
     }
 }

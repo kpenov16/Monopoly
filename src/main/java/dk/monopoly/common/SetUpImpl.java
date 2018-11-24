@@ -25,7 +25,7 @@ public class SetUpImpl {
         List<Integer> balances = new ArrayList<>();
         int startBalance = getStartBalance(playersNames.size());
         for (String name : playersNames){
-            Player p = Context.createPlayer(name, startBalance);
+            Player p = Context.createPlayer(name, startBalance, Context.getBank("default"));
             p.setCurrentField( fieldGateway.getFieldByIndex(0) );
             playerGateway.addPlayer(p);
 

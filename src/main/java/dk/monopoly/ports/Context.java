@@ -89,11 +89,12 @@ public class Context {
         return p;
     }
 
-    public static Player createPlayer(String name, int balance){
+    public static Player createPlayer(String name, int balance, Bank bank){
         MonopolyPlayer p = new MonopolyPlayer( Context.createAccount(balance) );
         p.setName(name);
         p.setHand( Context.createHand(2) );
         p.setInfoService(Context.createInfoService("DK"));
+        p.setBank(bank);
         return p;
     }
 

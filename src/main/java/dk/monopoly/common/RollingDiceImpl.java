@@ -75,9 +75,21 @@ public class RollingDiceImpl {
                 msg += currentChance.getMessage();
 
                 player.setCurrentField(field);
-            }else if(chanceCard instanceof YouGet100FromEachPlayer){
+            }else if(chanceCard instanceof GetOutOfPrison){
+                ChanceCard currentChance = chanceCard;
+                player.setChanceCard(currentChance);
+                msg += currentChance.getMessage();
 
+                player.setCurrentField(field);
+            }else if(chanceCard instanceof Pay200ToTheBank){
+                Pay200ToTheBank currentChance = (Pay200ToTheBank) chanceCard;
+                currentChance.act(player, "default");
+                msg += currentChance.getMessage();
+
+                player.setCurrentField(field);
             }else{
+                msg += chanceCard.getMessage();
+
                 player.setCurrentField(field);
             }
             //msg += chanceCard.act();

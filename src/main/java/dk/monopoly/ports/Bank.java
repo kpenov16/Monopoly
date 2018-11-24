@@ -6,6 +6,7 @@ import java.util.List;
 public abstract class Bank {
     List<Field> fields = new ArrayList<>();
     private Account account;
+    private String name = "default";
 
     public void addProperty(Field field){
         fields.add(field);
@@ -27,5 +28,15 @@ public abstract class Bank {
     public void sellProperty(Field field, Player owner) {
         account.add(field.getPrice());
         field.setOwner(owner);
+    }
+    public void setName(String name){
+        this.name = name;
+    }
+    public String getName(){
+        return name;
+    }
+
+    public void pay(int sum) {
+        account.add(sum);
     }
 }

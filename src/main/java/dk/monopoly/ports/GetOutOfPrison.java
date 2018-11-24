@@ -4,6 +4,6 @@ public class GetOutOfPrison extends ChanceCard {
 
     @Override
     public String getMessage() {
-        return "GetOutOfPrison";
+        return "Get Out Of Prison Card";
     }
 }

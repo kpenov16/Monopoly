@@ -3,6 +3,8 @@ package dk.monopoly.ports;
 public abstract class Player extends Owner{
     protected Hand hand;
     protected InfoService infoService;
+    protected ChanceCard chanceCard;
+    protected Bank bank;
 
     public abstract int getBalance();
 
@@ -37,5 +39,10 @@ public abstract class Player extends Owner{
 
     public abstract void addToBalance(int addend);
 
-    public abstract void pay(Player player, int i);
+    public abstract void pay(Player player, int sum);
+    public abstract void pay(String bankName, int sum);
+
+    public abstract void setChanceCard(ChanceCard chanceCard);
+
+    public abstract void setBank(Bank bank);
 }

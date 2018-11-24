@@ -14,7 +14,7 @@ public abstract class Chance extends Field {
                             new MoveToOrangeAndGetForFreeIfForSell(),
                             new MoveOneAheadOrTakeAChanceCardMore(),
                             new NextTurnBuyAFieldForSellOrFromAnotherPlayer(),
-                            new Pay200ToTheBank(),
+                            new Pay200ToTheBank(),//done
                             new GetOrangeOrGreenFieldForFreeIfForSellOtherwizePayRent(),
                             new GetCyanFieldForFreeIfForSellOtherwizePayRent(),
                             new GetOutOfPrison(),//working
