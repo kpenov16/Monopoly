@@ -17,11 +17,11 @@ public abstract class Chance extends Field {
                             new Pay200ToTheBank(),
                             new GetOrangeOrGreenFieldForFreeIfForSellOtherwizePayRent(),
                             new GetCyanFieldForFreeIfForSellOtherwizePayRent(),
-                            new GetOutOfPrison(),
+                            new GetOutOfPrison(),//working
                             new MoveToTheSeafrontField(),
                             new NextTurnBuyAFieldForSellOrFromAnotherPlayer(),
                             new NextTurnBuyAFieldForSellOrFromAnotherPlayer(),
-                            new YouGet100FromEachPlayer(),
+                            new YouGet100FromEachPlayer(),//done
                             new GetPinkOrBlueFieldForFreeIfForSellOtherwizePayRent(),
                             new Get200FromTheBank(),
                             new GetRedFieldForFreeIfForSellOtherwizePayRent(),

@@ -162,6 +162,11 @@ class AccountTest {
         public void addToBalance(int addend) {
 
         }
+
+        @Override
+        public void pay(Player player, int i) {
+
+        }
     }
 
 }

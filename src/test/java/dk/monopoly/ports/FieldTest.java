@@ -168,12 +168,8 @@ class FieldTest {
         }
         @Override
         public void play() { }
-
         @Override
-        public void roll() {
-
-        }
-
+        public void roll() { }
         @Override
         protected void setHand(Hand hand) { }
         @Override
@@ -190,25 +186,19 @@ class FieldTest {
         }
         @Override
         public void buy(Field field) { }
-
         @Override
         public boolean ownsTwoFields(Field.FieldColor fieldColor) {
             return false;
         }
-
         @Override
         public int getCurrentFieldIndex() {
             return 0;
         }
-
         @Override
-        public void setCurrentField(Field field) {
-
-        }
-
+        public void setCurrentField(Field field) { }
         @Override
-        public void addToBalance(int addend) {
-
-        }
+        public void addToBalance(int addend) { }
+        @Override
+        public void pay(Player player, int i) { }
     }
 }

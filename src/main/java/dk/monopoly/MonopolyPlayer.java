@@ -123,5 +123,11 @@ public class MonopolyPlayer extends Player {
         account.add(addend);
     }
 
+    @Override
+    public void pay(Player payee, int amount) {
+        account.subtract(amount);
+        payee.addToBalance(amount);
+    }
+
 
 }

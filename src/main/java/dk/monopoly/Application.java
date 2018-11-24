@@ -47,8 +47,6 @@ public class Application {
 
         fields[0].setCar(ico,true);
         fields[0].setCar(kaloyan,true);
-
-
         */
 
     }

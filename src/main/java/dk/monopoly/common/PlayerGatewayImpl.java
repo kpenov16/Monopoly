@@ -23,4 +23,14 @@ public class PlayerGatewayImpl implements PlayerGateway {
     public void addPlayer(Player p) {
         players.add(p);
     }
+
+    @Override
+    public List<Player> getAllPlayersByNameExcept(String playerName) {
+        List<Player> playersResponse = new ArrayList<>();
+        for (Player p : players)
+            if(!playerName.equals(p.getName()))
+                playersResponse.add(p);
+        return playersResponse;
+    }
+
 }

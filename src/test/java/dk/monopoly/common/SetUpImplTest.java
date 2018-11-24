@@ -39,6 +39,11 @@ class SetUpImplTest {
         public Player getPlayerMyName(String playerName) { return null; }
         @Override
         public void addPlayer(Player player) { }
+
+        @Override
+        public List<Player> getAllPlayersByNameExcept(String playerName) {
+            return null;
+        }
     }
     private class FakeFieldGateway implements FieldGateway {
         @Override

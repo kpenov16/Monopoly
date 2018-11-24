@@ -3,6 +3,8 @@ package dk.monopoly.common;
 import dk.monopoly.*;
 import dk.monopoly.ports.*;
 
+import java.util.List;
+
 public class RollingDiceImpl {
     private RollingDicePresenter rollingDicePresenter;
     private PlayerGatewayImpl playerGatewayImpl;
@@ -62,12 +64,23 @@ public class RollingDiceImpl {
 
     private String executeBeforeStart(Player player, int calculatedIndex, RollingDiceResponse response) {
         Field field;
-        String msg;
+        String msg = "";
         field = fieldGateway.getFieldByIndex(calculatedIndex);
         if(field instanceof Chance){
-            ChanceImpl chance = (ChanceImpl)field;
-            ChanceCard chanceCard = chance.getChanceCard();
-            msg = "Chance";
+            msg = "Chance: ";
+            ChanceCard chanceCard = ((ChanceImpl)field).getChanceCard();
+            if(chanceCard instanceof YouGet100FromEachPlayer){
+                YouGet100FromEachPlayer currentChance = (YouGet100FromEachPlayer) chanceCard;
+                currentChance.act(player, playerGatewayImpl.getAllPlayersByNameExcept(player.getName()));
+                msg += currentChance.getMessage();
+
+                player.setCurrentField(field);
+            }else if(chanceCard instanceof YouGet100FromEachPlayer){
+
+            }else{
+                player.setCurrentField(field);
+            }
+            //msg += chanceCard.act();
         }else if (field instanceof PrisonGuestImpl){
             msg = "PrisonGuestImpl";
             player.setCurrentField(field);

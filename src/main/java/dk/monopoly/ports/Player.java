@@ -36,4 +36,6 @@ public abstract class Player extends Owner{
     public abstract void setCurrentField(Field field);
 
     public abstract void addToBalance(int addend);
+
+    public abstract void pay(Player player, int i);
 }
