@@ -22,6 +22,7 @@ public class RollingDiceImpl {
         player.addToBalance(StartImpl.START_BONUS);
     }
 
+    private int nextFieldIndex;
     public void execute(String playerName) {
         RollingDiceResponse response = new RollingDiceResponseImpl();
         String msg = "";
@@ -29,28 +30,28 @@ public class RollingDiceImpl {
         player.roll();
         int die = player.getDie(0);
         int currentFieldIndex = player.getCurrentFieldIndex();
-        int calculatedIndex = currentFieldIndex + die;
+        nextFieldIndex = currentFieldIndex + die;
         Field field=null;
-        if(calculatedIndex == 24) {//on the start
+        if(nextFieldIndex == 24) {//on the start
             collectStartBonus(player);
-            calculatedIndex = 0;
-            player.setCurrentField(fieldGateway.getFieldByIndex(calculatedIndex));
-            msg = "Bonus on Start " + StartImpl.START_BONUS;
-        }else if(calculatedIndex > 24) {//crossing the start
+            nextFieldIndex = 0;
+            player.setCurrentField(fieldGateway.getFieldByIndex(nextFieldIndex));
+            msg += "Bonus on Start " + StartImpl.START_BONUS;
+        }else if(nextFieldIndex > 24) {//crossing the start
             collectStartBonus(player);
-            calculatedIndex = calculatedIndex - 24;
+            nextFieldIndex = nextFieldIndex - 24;
             msg = "Bonus of " + StartImpl.START_BONUS + " for passing the Start\n";
-            //player.setCurrentField(fieldGateway.getFieldByIndex(calculatedIndex));
-            msg += executeBeforeStart(player, calculatedIndex, response);
+            //player.setCurrentField(fieldGateway.getFieldByIndex(nextFieldIndex));
+            msg += executeBeforeStart(player, response);
         }else{ //before start
-            msg = executeBeforeStart(player, calculatedIndex, response);
+            msg = executeBeforeStart(player, response);
         }
 
 
         response.playerName = player.getName();
         response.balance = player.getBalance();
         response.firstDie = player.getDie(0);
-        response.currentFieldIndex = calculatedIndex;
+        response.currentFieldIndex = nextFieldIndex;
         response.isFinished = (response.balance <= 0)?true:false;
         response.msg = msg;
         //player.play();
@@ -62,10 +63,10 @@ public class RollingDiceImpl {
         rollingDicePresenter.present(response);
     }
 
-    private String executeBeforeStart(Player player, int calculatedIndex, RollingDiceResponse response) {
+    private String executeBeforeStart(Player player, RollingDiceResponse response) {
         Field field;
         String msg = "";
-        field = fieldGateway.getFieldByIndex(calculatedIndex);
+        field = fieldGateway.getFieldByIndex(nextFieldIndex);
         if(field instanceof Chance){
             msg = "Chance: ";
             ChanceCard chanceCard = ((ChanceImpl)field).getChanceCard();
@@ -87,6 +88,14 @@ public class RollingDiceImpl {
                 msg += currentChance.getMessage();
 
                 player.setCurrentField(field);
+            }else if(chanceCard instanceof MoveToStartCard){
+
+                MoveToStartCard currentChance = (MoveToStartCard) chanceCard;
+                currentChance.act(player);
+                msg += currentChance.getMessage();
+                msg += "Bonus on Start " + StartImpl.START_BONUS;
+                nextFieldIndex = 0;
+                player.setCurrentField(fieldGateway.getFieldByIndex(nextFieldIndex));
             }else{
                 msg += chanceCard.getMessage();
 

@@ -9,7 +9,7 @@ import java.util.List;
 public abstract class Chance extends Field {
     protected static List<ChanceCard> chanceCards = new ArrayList<>(
             Arrays.asList(  new BuyAFieldAndGetOneMoreChanceCard(),
-                            new MoveToStartCard(),
+                            new MoveToStartCard(),//done
                             new Move5FieldsAhead(),
                             new MoveToOrangeAndGetForFreeIfForSell(),
                             new MoveOneAheadOrTakeAChanceCardMore(),
