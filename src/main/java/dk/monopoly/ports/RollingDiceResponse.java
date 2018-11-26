@@ -1,7 +1,5 @@
 package dk.monopoly.ports;
 
-import dk.monopoly.common.RollingDiceViewModel;
-
 public abstract class RollingDiceResponse {
     public String playerName = null;
     public Integer firstDie = null;
@@ -11,9 +9,15 @@ public abstract class RollingDiceResponse {
     public Integer currentFieldIndex = null;
     public Landlord landlord = new Landlord();
     public Boolean playerPaysRent = null;
+    public PreviousFieldType callingField = null;
 
     public class Landlord {
         public String name=null;
         public Integer balance=null;
+    }
+    public enum PreviousFieldType {
+        CHANCE,
+        NORMAL_ROLL,
+        SPECIAL_ROLL
     }
 }

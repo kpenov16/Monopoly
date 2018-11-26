@@ -100,6 +100,13 @@ public class MonopolyPlayer  extends Player{
     public boolean ownsTwoFields(Field.FieldColor fieldColor) {
         int counts = 0;
         for(Field f : ownedFields){
+            if(f == null)
+                break;
+            if(fieldColor==null)
+                break;
+            if(f.getFieldColor()==null)
+                break;
+
             if(f.getFieldColor().toString().equals(fieldColor.toString())) {
                 if(++counts == 2)
                     return true;

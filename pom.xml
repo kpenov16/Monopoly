@@ -32,7 +32,7 @@
         <dependency>
             <groupId>diplomitdtu</groupId>
             <artifactId>matadorgui</artifactId>
-            <version>3.1.0</version>
+            <version>3.1.4</version>
         </dependency>
     </dependencies>
 </project>

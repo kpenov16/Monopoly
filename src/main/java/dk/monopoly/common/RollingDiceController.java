@@ -9,6 +9,6 @@ public class RollingDiceController {
     }
 
     public void execute() {
-        rollingDiceImpl.execute(rollingDiceViewModel.playerName);
+        rollingDiceImpl.execute(rollingDiceViewModel.playerName, rollingDiceViewModel.callingFieldType);
     }
 }

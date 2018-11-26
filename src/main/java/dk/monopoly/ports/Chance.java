@@ -10,7 +10,7 @@ public abstract class Chance extends Field {
     protected static List<ChanceCard> chanceCards = new ArrayList<>(
             Arrays.asList(  new BuyAFieldAndGetOneMoreChanceCard(),
                             new MoveToStartCard(),//done
-                            new Move5FieldsAhead(),
+                            new Move5FieldsAhead(),//working
                             new MoveToOrangeAndGetForFreeIfForSell(),
                             new MoveOneAheadOrTakeAChanceCardMore(),
                             new NextTurnBuyAFieldForSellOrFromAnotherPlayer(),

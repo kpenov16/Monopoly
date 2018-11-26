@@ -2,77 +2,60 @@ package dk.monopoly.common;
 
 import dk.monopoly.*;
 import dk.monopoly.ports.*;
-
-import java.util.List;
+import dk.monopoly.ports.RollingDiceResponse.PreviousFieldType;
 
 public class RollingDiceImpl {
-    private RollingDicePresenter rollingDicePresenter;
-    private PlayerGatewayImpl playerGatewayImpl;
-    private FieldGateway fieldGateway;
 
-    public RollingDiceImpl(RollingDicePresenter rollingDicePresenter,
-                           PlayerGatewayImpl playerGatewayImpl,
+    private RollingDicePresenter presenter;
+    private PlayerGateway playerGateway;
+    private FieldGateway fieldGateway;
+    public RollingDiceImpl(RollingDicePresenter presenter,
+                           PlayerGateway playerGateway,
                            FieldGateway fieldGateway) {
-        this.rollingDicePresenter = rollingDicePresenter;
-        this.playerGatewayImpl = playerGatewayImpl;
+        this.presenter = presenter;
+        this.playerGateway = playerGateway;
         this.fieldGateway = fieldGateway;
     }
-
-    private void collectStartBonus(Player player){
-        player.addToBalance(StartImpl.START_BONUS);
-    }
-
     private int nextFieldIndex;
-    public void execute(String playerName) {
-        RollingDiceResponse response = new RollingDiceResponseImpl();
-        String msg = "";
-        Player player = playerGatewayImpl.getPlayerMyName(playerName);
+    private boolean collectStartBonus = false;
+    private Field field=null;
+    private String msg="";
+    private Player player;
+
+    private int getNextFieldIndexByRoll(Player player){
         player.roll();
         int die = player.getDie(0);
-        int currentFieldIndex = player.getCurrentFieldIndex();
-        nextFieldIndex = currentFieldIndex + die;
-        Field field=null;
-        if(nextFieldIndex == 24) {//on the start
-            collectStartBonus(player);
-            nextFieldIndex = 0;
-            player.setCurrentField(fieldGateway.getFieldByIndex(nextFieldIndex));
-            msg += "Bonus on Start " + StartImpl.START_BONUS;
-        }else if(nextFieldIndex > 24) {//crossing the start
-            collectStartBonus(player);
+        return player.getCurrentFieldIndex() + die;
+    }
+    private static int fiveFieldsAheadIndex=0;
+    public void execute(String playerName, PreviousFieldType type) {
+        player = playerGateway.getPlayerMyName(playerName);
+
+        if(type == PreviousFieldType.NORMAL_ROLL){
+            nextFieldIndex = getNextFieldIndexByRoll(player);
+            fiveFieldsAheadIndex = 0;//reset
+        }else if(type == PreviousFieldType.CHANCE)
+            nextFieldIndex = fiveFieldsAheadIndex;
+
+        msg = "";
+        collectStartBonus = nextFieldIndex >= 24 ? true : false;
+        if(collectStartBonus){
             nextFieldIndex = nextFieldIndex - 24;
-            msg = "Bonus of " + StartImpl.START_BONUS + " for passing the Start\n";
-            //player.setCurrentField(fieldGateway.getFieldByIndex(nextFieldIndex));
-            msg += executeBeforeStart(player, response);
-        }else{ //before start
-            msg = executeBeforeStart(player, response);
+            collectStartBonus(player);
+            msg += "Start bonus " + StartImpl.START_BONUS + " ";
         }
 
-
-        response.playerName = player.getName();
-        response.balance = player.getBalance();
-        response.firstDie = player.getDie(0);
-        response.currentFieldIndex = nextFieldIndex;
-        response.isFinished = (response.balance <= 0)?true:false;
-        response.msg = msg;
-        //player.play();
-        int balance = player.getBalance();
-        int firstDie = player.getDie(0);
-        int secondDie = player.getDie(1);
-        boolean isWinner = player.isWinner();
-        //String msg = player.getMessage();
-        rollingDicePresenter.present(response);
-    }
-
-    private String executeBeforeStart(Player player, RollingDiceResponse response) {
-        Field field;
-        String msg = "";
+        RollingDiceResponse response = new RollingDiceResponseImpl();
+        response.callingField = PreviousFieldType.NORMAL_ROLL;
         field = fieldGateway.getFieldByIndex(nextFieldIndex);
-        if(field instanceof Chance){
-            msg = "Chance: ";
+        if(field instanceof StartImpl){
+            player.setCurrentField(field);
+        }else if(field instanceof Chance){
+            msg += "Chance: ";
             ChanceCard chanceCard = ((ChanceImpl)field).getChanceCard();
             if(chanceCard instanceof YouGet100FromEachPlayer){
                 YouGet100FromEachPlayer currentChance = (YouGet100FromEachPlayer) chanceCard;
-                currentChance.act(player, playerGatewayImpl.getAllPlayersByNameExcept(player.getName()));
+                currentChance.act(player, playerGateway.getAllPlayersByNameExcept(player.getName()));
                 msg += currentChance.getMessage();
 
                 player.setCurrentField(field);
@@ -96,12 +79,16 @@ public class RollingDiceImpl {
                 msg += "Bonus on Start " + StartImpl.START_BONUS;
                 nextFieldIndex = 0;
                 player.setCurrentField(fieldGateway.getFieldByIndex(nextFieldIndex));
+            }else if(chanceCard instanceof Move5FieldsAhead){
+                msg += chanceCard.getMessage();
+                player.setCurrentField(field);
+                response.callingField = PreviousFieldType.CHANCE;
+                fiveFieldsAheadIndex = nextFieldIndex + 5;
             }else{
                 msg += chanceCard.getMessage();
 
                 player.setCurrentField(field);
             }
-            //msg += chanceCard.act();
         }else if (field instanceof PrisonGuestImpl){
             msg = "PrisonGuestImpl";
             player.setCurrentField(field);
@@ -110,24 +97,33 @@ public class RollingDiceImpl {
             player.setCurrentField(field);
         }else if (field instanceof PrisonImpl){
             msg = "PrisonImpl";
-        }else{
-            if(!field.hasOwner()){//buy the field
-                player.buy(field);
-                player.setCurrentField(field);
-                msg = "field price: " + field.getPrice();
-            }else if(!field.ownedBy(player)){//rent the field
-                field.rent(player);
-                player.setCurrentField(field);
-                msg = "field rent: :" + field.getRent();
+            player.setCurrentField(field);
+        }else if(!field.hasOwner()){//buy the field
+            player.buy(field);
+            player.setCurrentField(field);
+            msg += "field price: " + field.getPrice();
+        }else if(!field.ownedBy(player)){//rent the field
+            field.rent(player);
+            player.setCurrentField(field);
+            msg += "field rent: :" + field.getRent();
 
-                response.playerPaysRent = true;
-                response.landlord.name = field.getLandlordName();
-                response.landlord.balance = field.getLandlordBalance();
-            }else {//player owns field
-                player.setCurrentField(field);
-                msg = "player owns field";
-            }
+            response.playerPaysRent = true;
+            response.landlord.name = field.getLandlordName();
+            response.landlord.balance = field.getLandlordBalance();
+        }else {//player owns field
+            player.setCurrentField(field);
+            msg += "player owns field";
         }
-        return msg;
+        response.playerName = player.getName();
+        response.balance = player.getBalance();
+        response.firstDie = player.getDie(0);
+        response.currentFieldIndex = nextFieldIndex;
+        response.isFinished = (response.balance <= 0)?true:false;
+        response.msg = msg;
+        presenter.present(response);
     }
+    private void collectStartBonus(Player player){
+        player.addToBalance(StartImpl.START_BONUS);
+    }
+
 }

@@ -1,8 +1,6 @@
 package dk.monopoly.common;
 
-import dk.monopoly.ports.Context;
-import gui_codebehind.GUI_Center;
-import gui_codebehind.GUI_FieldFactory;
+import dk.monopoly.ports.RollingDiceResponse;
 import gui_fields.*;
 import gui_main.GUI;
 
@@ -46,7 +44,17 @@ public class MonopolyGui {
     }
 
     private void resetViewModel() {
-        rollingDiceViewModel = new RollingDiceViewModel();
+        if(rollingDiceViewModel.callingFieldType == RollingDiceResponse.PreviousFieldType.NORMAL_ROLL)
+            rollingDiceViewModel = new RollingDiceViewModel();
+        else{
+            rollingDiceViewModel.msg="";
+            rollingDiceViewModel.balance = 0;
+            rollingDiceViewModel.isWinner = false;
+            rollingDiceViewModel.playerPaysRent = false;
+            rollingDiceViewModel.landlordName = "";
+            rollingDiceViewModel.playerPaysRent = false;
+        }
+
     }
 
     private boolean isWinner() {
@@ -68,8 +76,8 @@ public class MonopolyGui {
     }
 
     private void executeRollingDiceUseCase() {
-        RollingDicePresenter rollingDicePresenter = new RollingDicePresenter(this, rollingDiceViewModel);
-        RollingDiceImpl rollingDiceImpl = new RollingDiceImpl(rollingDicePresenter, playerGatewayImpl, fieldGatewayImpl);
+        RollingDicePresenterImpl rollingDicePresenterImpl = new RollingDicePresenterImpl(this, rollingDiceViewModel);
+        RollingDiceImpl rollingDiceImpl = new RollingDiceImpl(rollingDicePresenterImpl, playerGatewayImpl, fieldGatewayImpl);
         RollingDiceController rollingDiceController = new RollingDiceController(rollingDiceViewModel, rollingDiceImpl);
         rollingDiceController.execute();
     }
@@ -314,21 +322,39 @@ public class MonopolyGui {
         String buttonName = gui.getUserButtonPressed("It's your turn " + rollingDiceViewModel.playerName, "Roll");
     }
     public void update() {
-        gui.setDice(rollingDiceViewModel.firstDie, rollingDiceViewModel.secondDie);
+        if(rollingDiceViewModel.callingFieldType == RollingDiceResponse.PreviousFieldType.NORMAL_ROLL){
+            gui.setDice(rollingDiceViewModel.firstDie, rollingDiceViewModel.secondDie);
 
-        GUI_Player player = playersGui.get(playerTurnIndex);
-        fields[playersBoardIndexes.get(playerTurnIndex)].setCar(player,false);
-        playersBoardIndexes.set(playerTurnIndex, rollingDiceViewModel.currentFieldIndex);
-        fields[playersBoardIndexes.get(playerTurnIndex)].setCar(player,true);
-        //fields[0].removeAllCars();
+            GUI_Player player = playersGui.get(playerTurnIndex);
+            fields[playersBoardIndexes.get(playerTurnIndex)].setCar(player,false);
+            playersBoardIndexes.set(playerTurnIndex, rollingDiceViewModel.currentFieldIndex);
+            fields[playersBoardIndexes.get(playerTurnIndex)].setCar(player,true);
+            //fields[0].removeAllCars();
 
-        playersGui.get(playerTurnIndex++).setBalance(rollingDiceViewModel.balance);
-        playerTurnIndex = generateNextPlayerIndex();
+            playersGui.get(playerTurnIndex++).setBalance(rollingDiceViewModel.balance);
+            playerTurnIndex = generateNextPlayerIndex();
 
-        gui.showMessage(rollingDiceViewModel.msg);
+            gui.showMessage(rollingDiceViewModel.msg);
 
-        if(hasPlayerPaidRent())
-            playersByName.get(rollingDiceViewModel.landlordName).setBalance(rollingDiceViewModel.landlordBalance);
+            if(hasPlayerPaidRent())
+                playersByName.get(rollingDiceViewModel.landlordName).setBalance(rollingDiceViewModel.landlordBalance);
+        }else if(rollingDiceViewModel.callingFieldType == RollingDiceResponse.PreviousFieldType.CHANCE){
+            //5 fields ahead chance
+            gui.setDice(rollingDiceViewModel.firstDie, rollingDiceViewModel.secondDie);
+            GUI_Player player = playersGui.get(playerTurnIndex);
+            fields[playersBoardIndexes.get(playerTurnIndex)].setCar(player,false);
+            playersBoardIndexes.set(playerTurnIndex, rollingDiceViewModel.currentFieldIndex);
+            fields[playersBoardIndexes.get(playerTurnIndex)].setCar(player,true);
+            //fields[0].removeAllCars();
+
+            playersGui.get(playerTurnIndex).setBalance(rollingDiceViewModel.balance);
+            //playerTurnIndex = generateNextPlayerIndex();
+
+            gui.showMessage(rollingDiceViewModel.msg);
+
+            //if(hasPlayerPaidRent())
+              //  playersByName.get(rollingDiceViewModel.landlordName).setBalance(rollingDiceViewModel.landlordBalance);
+        }
 
     }
 
