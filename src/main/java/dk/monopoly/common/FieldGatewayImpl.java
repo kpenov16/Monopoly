@@ -1,7 +1,7 @@
 package dk.monopoly.common;
 
-import dk.monopoly.ports.Field;
-import dk.monopoly.ports.FieldGateway;
+import dk.monopoly.entities.Field;
+import dk.monopoly.gateways.FieldGateway;
 
 import java.util.ArrayList;
 import java.util.List;

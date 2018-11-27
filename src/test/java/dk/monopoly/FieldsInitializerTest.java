@@ -1,6 +1,8 @@
 package dk.monopoly;
 
-import dk.monopoly.ports.InfoService;
+import dk.monopoly.entities.InfoService;
+import dk.monopoly.entities.impls.FieldsInitializer;
+import dk.monopoly.entities.impls.MessageBag;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

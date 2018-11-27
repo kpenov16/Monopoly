@@ -1,7 +1,7 @@
 package dk.monopoly.common;
 
-import dk.monopoly.ports.Player;
-import dk.monopoly.ports.PlayerGateway;
+import dk.monopoly.entities.Player;
+import dk.monopoly.gateways.PlayerGateway;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +31,11 @@ public class PlayerGatewayImpl implements PlayerGateway {
             if(!playerName.equals(p.getName()))
                 playersResponse.add(p);
         return playersResponse;
+    }
+
+    @Override
+    public List<Player> getAllPlayers() {
+        return players;
     }
 
 }

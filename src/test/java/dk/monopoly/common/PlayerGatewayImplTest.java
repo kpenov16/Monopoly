@@ -1,14 +1,12 @@
 package dk.monopoly.common;
 
-import dk.monopoly.MonopolyPlayer;
-import dk.monopoly.ports.Context;
-import dk.monopoly.ports.Player;
-import dk.monopoly.ports.PlayerGateway;
+import dk.monopoly.entities.impls.MonopolyPlayer;
+import dk.monopoly.entities.Player;
+import dk.monopoly.gateways.PlayerGateway;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
