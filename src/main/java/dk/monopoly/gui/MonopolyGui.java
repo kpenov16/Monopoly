@@ -45,6 +45,12 @@ public class MonopolyGui implements RollDiceView, EndGameView {
     private GUI_Field[] fields = new GUI_Field[24];
     private List<Integer> playersBoardIndexes = new ArrayList<>();
     private boolean thereIsAWinner = false;
+
+    public MonopolyGui(PlayerGatewayImpl playerGateway, EndGameViewModel endGameViewModel) {
+        this.playerGatewayImpl = playerGateway;
+        this.endGameViewModel = endGameViewModel;
+    }
+
     public void start() {
         setupPlayers();
         executeSetUpUseCase();
@@ -57,15 +63,18 @@ public class MonopolyGui implements RollDiceView, EndGameView {
             thereIsAWinner = rollingDiceViewModel.isWinner;
             resetViewModel();
         }
-        endGameViewModel = new EndGameViewModel();
         executeEndGameUseCase();
     }
+
+    private EndGameController endGameControllerImpl;
     private void executeEndGameUseCase() {
-        EndGamePresenter endGamePresenterImpl = new EndGamePresenterImpl(this, endGameViewModel);
-        EndGameImpl endGameImpl = new EndGameImpl(endGamePresenterImpl, playerGatewayImpl);
-        EndGameController endGameControllerImpl = new EndGameControllerImpl(endGameViewModel, endGameImpl);
         endGameControllerImpl.execute();
     }
+
+    public void setController(EndGameController endGameControllerImpl) {
+        this.endGameControllerImpl = endGameControllerImpl;
+    }
+
     private void resetViewModel() {
         if(rollingDiceViewModel.callingFieldType == RollingDiceResponse.PreviousFieldType.NORMAL_ROLL)
             rollingDiceViewModel = new RollingDiceViewModel();
@@ -81,9 +90,7 @@ public class MonopolyGui implements RollDiceView, EndGameView {
         gui.showMessage(msg);
     }
     @Override
-    public void endGame() {
-        showMessage(endGameViewModel.msg);
-    }
+    public void endGame() { showMessage(endGameViewModel.msg); }
     private void evaluatePlayerTurn() {
         rollingDiceViewModel.playerName = setUpViewModel.playersNames.get(playerTurnIndex);
     }
@@ -182,6 +189,8 @@ public class MonopolyGui implements RollDiceView, EndGameView {
         }
         return numberOfPlayers;
     }
+
+
     private class NumberPlayersResponse implements Runnable{
         private String[] values;
         private String response;
