@@ -60,14 +60,12 @@ public class MonopolyGui implements RollDiceView, EndGameView {
         endGameViewModel = new EndGameViewModel();
         executeEndGameUseCase();
     }
-
     private void executeEndGameUseCase() {
         EndGamePresenter endGamePresenterImpl = new EndGamePresenterImpl(this, endGameViewModel);
         EndGameImpl endGameImpl = new EndGameImpl(endGamePresenterImpl, playerGatewayImpl);
         EndGameController endGameControllerImpl = new EndGameControllerImpl(endGameViewModel, endGameImpl);
         endGameControllerImpl.execute();
     }
-
     private void resetViewModel() {
         if(rollingDiceViewModel.callingFieldType == RollingDiceResponse.PreviousFieldType.NORMAL_ROLL)
             rollingDiceViewModel = new RollingDiceViewModel();
@@ -78,13 +76,10 @@ public class MonopolyGui implements RollDiceView, EndGameView {
             rollingDiceViewModel.landlordName = "";
             rollingDiceViewModel.playerPaysRent = false;
         }
-
     }
-
     private void showMessage(String msg) {
         gui.showMessage(msg);
     }
-
     @Override
     public void endGame() {
         showMessage(endGameViewModel.msg);
@@ -109,7 +104,6 @@ public class MonopolyGui implements RollDiceView, EndGameView {
     private void askPlayerToRoll(){
         String buttonName = gui.getUserButtonPressed("It's your turn " + rollingDiceViewModel.playerName, "Roll");
     }
-
     @Override
     public void update() {
         if(rollingDiceViewModel.callingFieldType == RollingDiceResponse.PreviousFieldType.NORMAL_ROLL){
@@ -149,7 +143,6 @@ public class MonopolyGui implements RollDiceView, EndGameView {
     private boolean hasPlayerPaidRent() {
         return rollingDiceViewModel.playerPaysRent != null && rollingDiceViewModel.playerPaysRent==true;
     }
-
     private void executeSetUpUseCase() {
         setUpViewModel = new SetUpViewModel();
         setUpViewModel.playersNames = playersNames;
@@ -189,7 +182,6 @@ public class MonopolyGui implements RollDiceView, EndGameView {
         }
         return numberOfPlayers;
     }
-
     private class NumberPlayersResponse implements Runnable{
         private String[] values;
         private String response;
