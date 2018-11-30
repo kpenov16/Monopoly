@@ -86,7 +86,7 @@ class RollingDiceImplTest {
         //act
         rollingDice.execute(playerName, RollingDiceResponse.PreviousFieldType.NORMAL_ROLL);
 
-        //assert
+        //logisk assert her
         RollingDiceResponseImpl response = (RollingDiceResponseImpl) presenter.getRollingDiceResponse();
         assertEquals(playerName, response.playerName);
         assertEquals(1900, (int)response.balance);
